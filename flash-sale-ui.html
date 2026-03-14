@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Sale UI - SapoTest</title>
+    <!-- Tải React và Babel từ CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: #ee4d2d; }
+        .message { padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .success { background-color: #e6fffa; color: #2d3748; border: 1px solid #38a169; }
+        .error { background-color: #fff5f5; color: #c53030; border: 1px solid #e53e3e; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .product-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .price-original { text-decoration: line-through; color: #999; margin-right: 10px; }
+        .price-sale { color: #ee4d2d; font-size: 1.2rem; font-weight: bold; }
+        .stock { color: #555; }
+        .btn-buy { width: 100%; padding: 12px; border: none; border-radius: 4px; font-weight: bold; color: white; cursor: pointer; transition: 0.3s; }
+        .btn-buy:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn-active { background-color: #ee4d2d; }
+        .btn-active:hover { background-color: #d73211; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const FlashSaleApp = () => {
+            const [products, setProducts] = useState([]);
+            const [message, setMessage] = useState({ text: '', type: '' });
+            const [loading, setLoading] = useState(false);
+            
+            const API_BASE = "http://localhost:8080/api";
+            const USER_ID = 1;
+
+            const fetchProducts = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/flash-sale/products`);
+                    const result = await response.json();
+                    if (result.httpStatus === 200) {
+                        setProducts(result.data);
+                    }
+                } catch (err) {
+                    console.error("Không thể kết nối Backend. Hãy chắc chắn Spring Boot đang chạy ở port 8080.");
+                }
+            };
+
+            useEffect(() => {
+                fetchProducts();
+                // Tự động làm mới mỗi 5 giây để cập nhật tồn kho
+                const interval = setInterval(fetchProducts, 5000);
+                return () => clearInterval(interval);
+            }, []);
+
+            const handleBuy = async (productId) => {
+                setLoading(true);
+                setMessage({ text: '', type: '' });
+                
+                try {
+                    const response = await fetch(`${API_BASE}/flash-sale/order`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId, quantity: 1, userId: USER_ID })
+                    });
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        setMessage({ text: "✅ " + result.message, type: 'success' });
+                        fetchProducts();
+                    } else {
+                        setMessage({ text: "❌ " + (result.message || "Lỗi không xác định"), type: 'error' });
+                    }
+                } catch (err) {
+                    setMessage({ text: "❌ Lỗi kết nối đến Server!", type: 'error' });
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="container">
+                    <h1>⚡ SAPO FLASH SALE</h1>
+                    
+                    {message.text && (
+                        <div className={`message ${message.type}`}>
+                            {message.text}
+                        </div>
+                    )}
+
+                    <div className="product-grid">
+                        {products.length === 0 ? (
+                            <p style={{textAlign:'center', gridColumn:'1/-1'}}>Đang tải sản phẩm hoặc Backend chưa có dữ liệu...</p>
+                        ) : (
+                            products.map(p => (
+                                <div key={p.productId} className="product-card">
+                                    <h3>{p.name}</h3>
+                                    <div>
+                                        <span className="price-original">{p.originalPrice?.toLocaleString()}đ</span>
+                                        <span className="price-sale">{p.salePrice?.toLocaleString()}đ</span>
+                                    </div>
+                                    <p className="stock">Còn lại: <strong>{p.inStock}</strong></p>
+                                    <button 
+                                        className={`btn-buy ${p.inStock > 0 ? 'btn-active' : ''}`}
+                                        disabled={loading || p.inStock <= 0}
+                                        onClick={() => handleBuy(p.productId)}
+                                    >
+                                        {loading ? 'ĐANG XỬ LÝ...' : (p.inStock > 0 ? 'MUA NGAY' : 'HẾT HÀNG')}
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FlashSaleApp />);
+    </script>
+</body>
+</html>
