@@ -18,5 +18,7 @@ public class Product {
 
     private String name;
     private Integer inStock;
+    private Double originalPrice;
+    private Double salePrice;
 
 }

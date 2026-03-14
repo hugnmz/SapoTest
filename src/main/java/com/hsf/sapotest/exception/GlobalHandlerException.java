@@ -11,13 +11,13 @@ import java.util.Date;
 @RestControllerAdvice
 public class GlobalHandlerException {
 
-    @ExceptionHandler(value = { InvalidDataException.class, Exception.class })
+    @ExceptionHandler(value = {InvalidDataException.class, Exception.class})
     public ErrorResponse handleException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setMessage(e.getMessage());
         errorResponse.setError(HttpStatus.CONFLICT.getReasonPhrase());
         errorResponse.setStatus(HttpStatus.CONFLICT.value());
-        errorResponse.setPath(request.getDescription(false).replace("uri=",""));
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
         errorResponse.setTimestamp(new Date());
 
         return errorResponse;

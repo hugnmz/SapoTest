@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Sale UI - SapoTest</title>
+    <!-- Tải React và Babel từ CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: #ee4d2d; }
+        .message { padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .success { background-color: #e6fffa; color: #2d3748; border: 1px solid #38a169; }
+        .error { background-color: #fff5f5; color: #c53030; border: 1px solid #e53e3e; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .product-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .price-original { text-decoration: line-through; color: #999; margin-right: 10px; }
+        .price-sale { color: #ee4d2d; font-size: 1.2rem; font-weight: bold; }
+        .stock { color: #555; }
+        .btn-buy { width: 100%; padding: 12px; border: none; border-radius: 4px; font-weight: bold; color: white; cursor: pointer; transition: 0.3s; }
+        .btn-buy:disabled { background-color: #ccc; cursor: not-allowed; }
+        .btn-active { background-color: #ee4d2d; }
+        .btn-active:hover { background-color: #d73211; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Gọi file logic React từ thư mục static -->
+    <script type="text/babel" th:src="@{/app.js}"></script>
+</body>
+</html>
