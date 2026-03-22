@@ -1,9 +1,10 @@
 package com.hsf.sapotest.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Setter
 public class ResponseData<T> {
 
     private final Integer httpStatus;

@@ -15,7 +15,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/")
 @RequiredArgsConstructor
-@CrossOrigin("*")
+@CrossOrigin("*") // pass CORS
 public class SaleController {
 
     private final SaleService saleService;
